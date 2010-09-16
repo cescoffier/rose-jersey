@@ -1,0 +1,36 @@
+Components
+==========
+
+The OSGiServiceServlet
+----------------------
+
+This servlet is exposed as a regular servlet to an available OSGi HTTP Service.
+The component extends 'com.sun.jersey.spi.container.servlet.ServletContainer'. 
+
+The servlet deploys root resource classes with OSGi integration. This class extends
+ServletContainer with a OSGi/iPOJO-based IoCComponentProviderFactory,
+{@link SpringComponentProviderFactory}, such that instances of resource and
+provider classes declared and managed by iPOJO can be obtained.
+
+Classes are 'exposed' as OSGi service. They will be automatically registered if such
+classes are root resource classes or provider classes. Scoping is not supported, except
+if the service are exposed inside a locale service registry (iPOJO composites).
+
+During initialization, the servlet creates an Component Provider Factory.
+
+The Component Provider Factory
+------------------------------
+
+This class implements IoCComponentProviderFactory, and manage the creation of the REST resources.
+The lookup is made by looking inside the OSGi service registry. Annotated services will be managed.
+
+The 'getComponentProvider' method returns a specific Component Provider which deal with the object creation.
+
+Scope support
+-------------
+
+It would be great to manage scopes on the exposed service side. However, this may also require dealing with:
+- OSGi Service Factory
+- iPOJO Service Factory
+
+Applying iPOJO Service Object strategy would be the ultimate goal.
