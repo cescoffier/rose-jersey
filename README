@@ -1,0 +1,5 @@
+The goal of the project is to provide an extension to OW2 Chameleon Rose (http://chameleon.ow2.org) to manage REST Resources using Sun Jersey. This allows to get OSGi services exposed as REST resources.
+
+The idea is to 'annotate' services which will be detected by Rose. Then, Rose delegates the exposition to the Jersey exposer (this project), which manages the communication with Jersey.
+
+The result will be close to the Spring-Jersey bridge but for iPOJO and OSGi services. 
