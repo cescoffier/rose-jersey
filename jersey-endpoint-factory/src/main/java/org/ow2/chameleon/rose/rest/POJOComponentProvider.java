@@ -1,20 +1,16 @@
 package org.ow2.chameleon.rose.rest;
 
-import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 
 
-public class POJOComponentProvider implements IoCComponentProviderFactory{
-
-    public IoCComponentProvider getComponentProvider(Class<?> klass) {
-        // TODO Auto-generated method stub
-        return null;
+public class POJOComponentProvider implements IoCComponentProvider {
+    private final Object instance;
+    
+    public POJOComponentProvider(Object service) {
+        instance = service;
     }
-
-    public IoCComponentProvider getComponentProvider(ComponentContext ccontext, Class<?> klass) {
-        // TODO Auto-generated method stub
-        return null;
+    
+    public Object getInstance() {
+        return instance;
     }
-
 }

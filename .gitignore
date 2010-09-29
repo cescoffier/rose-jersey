@@ -1,3 +1,11 @@
-!/*.project
-!/*.classpath
-!/*.settings
+# Eclipse  #
+############
+
+*.project
+*.classpath
+*.settings
+
+# build #
+#########
+target
+

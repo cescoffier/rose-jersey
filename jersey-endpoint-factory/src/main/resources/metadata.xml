@@ -24,6 +24,7 @@
 		</provides>
 
 		<properties>
+			<property field="servletname" name="servlet.name" value="/rest"/>
 		</properties>
 
 		<requires field="httpservice" optional="false" />

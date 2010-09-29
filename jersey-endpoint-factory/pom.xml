@@ -84,7 +84,7 @@
 							${project.artifactId}
 						</Bundle-SymbolicName>
 						<Private-Package>
-							org.ow2.chameleon.rose.rest.endpoint
+							org.ow2.chameleon.rose.rest
 						</Private-Package>
 						<Export-Package />
 						<Import-Package>
@@ -126,7 +126,7 @@
 		<repository>
 			<id>maven2-repository.dev.java.net</id>
 			<name>Java.net Repository for Maven</name>
-			<url>http://download.java.net/maven/2/</url>
+			<url>stt/</url>
 			<layout>default</layout>
 		</repository> 
 		<repository>
