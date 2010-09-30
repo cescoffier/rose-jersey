@@ -1,17 +1,16 @@
-<!--
-	Copyright 2009 OW2 Chameleon
-	Licensed under the Apache License, Version 2.0 (the "License");
-	you may not use this file except in compliance with the License.
-	You may obtain a copy of the License at
 
-	http://www.apache.org/licenses/LICENSE-2.0
+	<!--
+		Copyright 2009 OW2 Chameleon Licensed under the Apache License,
+		Version 2.0 (the "License"); you may not use this file except in
+		compliance with the License. You may obtain a copy of the License at
 
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.
--->
+		http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+		applicable law or agreed to in writing, software distributed under the
+		License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+		CONDITIONS OF ANY KIND, either express or implied. See the License for
+		the specific language governing permissions and limitations under the
+		License.
+	-->
 
 
 <ipojo xmlns:wbp="org.apache.felix.ipojo.whiteboard">
@@ -24,17 +23,31 @@
 		</provides>
 
 		<properties>
-			<property field="servletname" name="servlet.name" value="/rest"/>
+			<property field="servletname" name="servlet.name" value="/rest" />
 		</properties>
+		
+		<requires field="myressource"/>
 
 		<requires field="httpservice" optional="false" />
-		<requires field="logger" optional="true" default-implementation="org.ow2.chameleon.rose.util.LogServiceImpl"/>
+		<requires field="logger" optional="true"
+			default-implementation="org.ow2.chameleon.rose.util.LogServiceImpl" />
 
 		<callback transition="validate" method="start" />
 		<callback transition="invalidate" method="stop" />
 
 	</component>
 
+	<component name="myressource.component" classname="org.ow2.chameleon.rose.rest.MyRessource">
+
+		<provides />
+
+		<properties>
+			<property field="name" name="name" value="YATAAA" />
+		</properties>
+
+	</component>
+
+	<instance name="myressource" component="myressource.component" />
 
 	<instance name="org.ow2.chameleon.rose.server.EndpointFactory-REST"
 		component="rose.component.rest.endpoint.factory" />

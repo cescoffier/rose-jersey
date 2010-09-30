@@ -4,29 +4,23 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 import org.osgi.service.http.HttpService;
 import org.osgi.service.log.LogService;
 import org.ow2.chameleon.rose.server.EndpointFactory;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
-import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.component.ComponentContext;
-import com.sun.jersey.core.spi.component.ComponentProvider;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCProxiedComponentProvider;
-import com.sun.jersey.spi.container.ParamQualifier;
-import com.sun.jersey.spi.inject.Inject;
 
 /**
  * This component provides a REST, Jersey based implementation of an
@@ -60,6 +54,7 @@ public class JerseyEndpointFactory implements EndpointFactory, IoCComponentProvi
     
     private ResourceConfig rsconfig = new DefaultResourceConfig();
     
+    private RessourceService myressource;
     
     ResourceConfig getResourceConfig(){
         return rsconfig;
@@ -75,8 +70,8 @@ public class JerseyEndpointFactory implements EndpointFactory, IoCComponentProvi
      */
     @SuppressWarnings("unused")
     private void start() {
-        pathToInstance.put("mytest", new Ressources());
-        rsconfig.getClasses().add(Ressources.class);
+        pathToInstance.put("test", myressource);
+        rsconfig.getClasses().add(RessourceService.class);
         Dictionary<String, String> properties = new Hashtable<String, String>();
         logger.log(LogService.LOG_INFO, "org.ow2.chameleon.rose.server.EndpointFactory-REST starting");
         try {
@@ -156,11 +151,13 @@ public class JerseyEndpointFactory implements EndpointFactory, IoCComponentProvi
             
             public Object proxy(Object arg0) {
                 // TODO Auto-generated method stub
+                System.out.println("proxy called");
                 return klass.cast(arg0);
             }
             
             public Object getInstance() {
                 try {
+                    System.out.println("getInstance called");
                     return klass.newInstance();
                 } catch (InstantiationException e) {
                     // TODO Auto-generated catch block
@@ -212,13 +209,13 @@ public class JerseyEndpointFactory implements EndpointFactory, IoCComponentProvi
          * For now we support only the singleton pattern.
          */
         public ComponentScope getScope() {
-            return ComponentScope.Undefined;
+            return ComponentScope.Singleton;
         }
 
         public Object getInjectableInstance(Object o) {
             //FIXME 
             System.out.println("Object name: " +o.toString());
-            System.out.println("injectable "+((Ressources) o).getList());
+            System.out.println("injectable "+((RessourceService) o).hello());
             
             return o;
         }
@@ -231,13 +228,4 @@ public class JerseyEndpointFactory implements EndpointFactory, IoCComponentProvi
         
     }
     
-    @Path("mytest")
-    public class Ressources {
-
-        @GET
-        @Produces(MediaType.APPLICATION_JSON)
-        public Set<String> getList() {
-            return pathToInstance.keySet();
-        }
-    }
 }
