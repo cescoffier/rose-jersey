@@ -4,8 +4,10 @@
 *.project
 *.classpath
 *.settings
+.externalToolBuilders
 
-# build #
+# maven #
 #########
+maven-eclipse.xml
 target
 

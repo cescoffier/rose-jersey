@@ -3,6 +3,7 @@ package org.ow2.chameleon.rose.rest;
 import static com.sun.jersey.api.core.ResourceConfig.isProviderClass;
 import static com.sun.jersey.api.core.ResourceConfig.isRootResourceClass;
 
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,7 +68,7 @@ public class OSGiComponentProviderFactory implements IoCComponentProviderFactory
      * @see com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory#getComponentProvider(com.sun.jersey.core.spi.component.ComponentContext, java.lang.Class)
      */
     public IoCComponentProvider getComponentProvider(ComponentContext ccontext,final Class<?> klass) {
-        
+        System.out.println("Get component Provider "+klass.getCanonicalName());
         //TODO What about the context
 
         //Singleton case
@@ -142,11 +143,14 @@ public class OSGiComponentProviderFactory implements IoCComponentProviderFactory
     
     
     public void createProvider(Object instance, Class<?> klass){
-        createProvider(klass);
-        pathToInstance.put(klass,new OSGiManagedComponentProvider(instance,klass));
+    	createProvider(klass);
+        pathToInstance.put(klass,new OSGiManagedComponentProvider(instance,instance.getClass()));
     }
     
-    public void createProvider(Class<?> klass){
+    public void createProvider(final Class<?> klass){
+    	for (Annotation anno : klass.getAnnotations()) {
+			System.out.println(anno.toString());
+		}
         if (!(isRootResourceClass(klass) || isProviderClass(klass) )){
             throw new IllegalArgumentException("The class:"+klass.getCanonicalName()+" is not a root ressource or a provider class.");
         }

@@ -29,7 +29,11 @@ public class JerseyServletContainer extends ServletContainer{
     
     @Override
     protected void initiate(ResourceConfig rsc, WebApplication webApp) {
-        webApp.initiate(providerFactory.getResourceConfig(),providerFactory);
+    	for (Class<?> klass : rsc.getClasses()) {
+			System.out.println(klass.getName());
+		}
+    	
+        webApp.initiate(rsc,providerFactory);
     }
     
 }

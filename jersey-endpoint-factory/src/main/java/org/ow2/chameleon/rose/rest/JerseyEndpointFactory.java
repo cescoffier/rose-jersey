@@ -2,29 +2,15 @@ package org.ow2.chameleon.rose.rest;
 
 import static org.osgi.service.log.LogService.LOG_INFO;
 
-import java.util.HashMap;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.ServletException;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.NewCookie;
-
 import org.osgi.service.http.HttpService;
 import org.osgi.service.log.LogService;
 import org.ow2.chameleon.rose.server.EndpointFactory;
-
-import com.sun.jersey.api.core.DefaultResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.core.spi.component.ComponentContext;
-import com.sun.jersey.core.spi.component.ComponentScope;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
-import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
-import com.sun.jersey.core.spi.component.ioc.IoCProxiedComponentProvider;
-import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 /**
  * This component provides a REST, Jersey based implementation of an
@@ -50,12 +36,9 @@ public class JerseyEndpointFactory implements EndpointFactory {
      */
     private Set<String> servletNames = new HashSet<String>();
     
-    
-    private ResourceConfig rsconfig = new DefaultResourceConfig();
-    
-    ServletContainer container;
-    
 
+    private MyDummyRessourceSpec dummy;
+    
     /*------------------------------------*
      *  Component Life-cycle methods      *
      *------------------------------------*/
@@ -65,6 +48,8 @@ public class JerseyEndpointFactory implements EndpointFactory {
      */
     @SuppressWarnings("unused")
     private void start() {
+    	OSGiComponentProviderFactory pro = new OSGiComponentProviderFactory(logger);
+    	pro.createProvider(dummy, MyDummyRessourceSpec.class);
     }
 
     /**
@@ -72,8 +57,8 @@ public class JerseyEndpointFactory implements EndpointFactory {
      */
     @SuppressWarnings("unused")
     private void stop() {
-            for (Iterator iterator = servletNames.iterator(); iterator.hasNext();) {
-                String name = (String) iterator.next();
+            for (Iterator<String> iterator = servletNames.iterator(); iterator.hasNext();) {
+                String name = iterator.next();
                 try {
                     httpservice.unregister(name);
                 } catch (RuntimeException re) {
@@ -129,13 +114,14 @@ public class JerseyEndpointFactory implements EndpointFactory {
         }
         
         OSGiComponentProviderFactory providerFact = new OSGiComponentProviderFactory(logger);
-        providerFact.createProvider(pService, klass);
-        servletNames.add(name);
+			providerFact.createProvider(pService,klass);
+
+			servletNames.add(name);
         
         logger.log(LogService.LOG_INFO, "org.ow2.chameleon.rose.server.EndpointFactory-REST starting");
         try {
             // Register the JerseyServletBridge
-            httpservice.registerServlet(name,new JerseyServletContainer(providerFact), null, null);
+            httpservice.registerServlet("/rest",new JerseyServletContainer(providerFact), null, null);
         } catch (Exception e) {
             e.printStackTrace();
             logger.log(LogService.LOG_ERROR, "Cannot register JerseyServletBridge ",e);
@@ -157,7 +143,7 @@ public class JerseyEndpointFactory implements EndpointFactory {
         
         try {
             if (httpservice != null) {
-                httpservice.unregister(pName);
+                httpservice.unregister("/rest");
             }
         } catch (RuntimeException re) {
             logger.log(LogService.LOG_ERROR, re.getMessage(), re);
