@@ -1,13 +1,17 @@
 package org.ow2.chameleon.rose.rest;
 
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
+import static org.osgi.service.log.LogService.LOG_INFO;
 
-import javax.ws.rs.GET;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.ServletException;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.NewCookie;
 
 import org.osgi.service.http.HttpService;
 import org.osgi.service.log.LogService;
@@ -18,16 +22,16 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCProxiedComponentProvider;
+import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 /**
  * This component provides a REST, Jersey based implementation of an
  * EndpointFactory service provider.
  * @author Jonathan Bardin <jonathan.bardin@imag.fr>
  */
-public class JerseyEndpointFactory implements EndpointFactory, IoCComponentProviderFactory {
+public class JerseyEndpointFactory implements EndpointFactory {
 
     public static final String[] CONFIGS = {"jersey"};
 
@@ -42,23 +46,14 @@ public class JerseyEndpointFactory implements EndpointFactory, IoCComponentProvi
     private LogService logger;
 
     /**
-     * The Servlet name of the jersey bridge.
+     * The Servlet name of the jersey containers.
      */
-    private String servletname;
-    
-    /**
-     * Path to instance
-     */
-    private Map<String,Object> pathToInstance = new HashMap<String, Object>();
+    private Set<String> servletNames = new HashSet<String>();
     
     
     private ResourceConfig rsconfig = new DefaultResourceConfig();
     
-    private RessourceService myressource;
-    
-    ResourceConfig getResourceConfig(){
-        return rsconfig;
-    }
+    ServletContainer container;
     
 
     /*------------------------------------*
@@ -70,17 +65,6 @@ public class JerseyEndpointFactory implements EndpointFactory, IoCComponentProvi
      */
     @SuppressWarnings("unused")
     private void start() {
-        pathToInstance.put("test", myressource);
-        rsconfig.getClasses().add(RessourceService.class);
-        Dictionary<String, String> properties = new Hashtable<String, String>();
-        logger.log(LogService.LOG_INFO, "org.ow2.chameleon.rose.server.EndpointFactory-REST starting");
-        try {
-            // Registered the JerseyServletBridge
-            httpservice.registerServlet(servletname, new JerseyServletBridge(this), properties, null);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.log(LogService.LOG_ERROR, "Cannot register JerseyServletBridge ",e);
-        } 
     }
 
     /**
@@ -88,13 +72,15 @@ public class JerseyEndpointFactory implements EndpointFactory, IoCComponentProvi
      */
     @SuppressWarnings("unused")
     private void stop() {
-        try {
-            if (httpservice != null) {
-                httpservice.unregister(servletname);
+            for (Iterator iterator = servletNames.iterator(); iterator.hasNext();) {
+                String name = (String) iterator.next();
+                try {
+                    httpservice.unregister(name);
+                } catch (RuntimeException re) {
+                    logger.log(LogService.LOG_ERROR, re.getMessage(), re);
+                }
+                iterator.remove();
             }
-        } catch (RuntimeException re) {
-            logger.log(LogService.LOG_ERROR, re.getMessage(), re);
-        }
     }
 
     /*------------------------------------*
@@ -118,6 +104,44 @@ public class JerseyEndpointFactory implements EndpointFactory, IoCComponentProvi
      * .Object, java.lang.ClassLoader, java.util.Map)
      */
     public void createEndpoint(final Object pService, final ClassLoader pLoader, final Map<String, String> properties){
+
+        if (!properties.containsKey(PROP_INTERFACE_NAME)){
+            throw new IllegalArgumentException("The properties must contain the "+PROP_INTERFACE_NAME+ " key");
+        }
+        
+        if (!properties.containsKey(PROP_ENDPOINT_NAME)){
+            throw new IllegalArgumentException("The properties must contain the "+PROP_ENDPOINT_NAME+ " key");
+        }
+        
+        
+        String classname = properties.get(PROP_INTERFACE_NAME);
+        String name = properties.get(PROP_ENDPOINT_NAME);
+
+        if (servletNames.contains(name)){
+            throw new IllegalArgumentException("A ressource with the path "+name+" has already been published !");
+        }
+                
+        Class<?> klass;
+        try {
+            klass = pLoader.loadClass(classname);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException("The given classloader does not contains the class: "+classname,e);
+        }
+        
+        OSGiComponentProviderFactory providerFact = new OSGiComponentProviderFactory(logger);
+        providerFact.createProvider(pService, klass);
+        servletNames.add(name);
+        
+        logger.log(LogService.LOG_INFO, "org.ow2.chameleon.rose.server.EndpointFactory-REST starting");
+        try {
+            // Register the JerseyServletBridge
+            httpservice.registerServlet(name,new JerseyServletContainer(providerFact), null, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.log(LogService.LOG_ERROR, "Cannot register JerseyServletBridge ",e);
+        } 
+        
+        logger.log(LOG_INFO, "The ressource: "+name+" has been succesfully registered");
     }
 
     /*
@@ -126,106 +150,20 @@ public class JerseyEndpointFactory implements EndpointFactory, IoCComponentProvi
      * org.ow2.chameleon.rose.server.EndpointFactory#destroyEndpoint(java.lang
      * .String)
      */
-    public void destroyEndpoint(String pService) throws IllegalArgumentException, NullPointerException {
-    }
-
-    /*------------------------------------------------*
-     *  IoCComponentProviderFactory methods           *
-     *------------------------------------------------*/
-
-    /*
-     * (non-Javadoc)
-     * @see com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory#getComponentProvider(java.lang.Class)
-     */
-    public IoCComponentProvider getComponentProvider(final Class<?> klass) {
-        //String name = klass.getAnnotation(javax.ws.rs.Path.class).value();
-        //System.out.println("PAth value: "+name);
-        Path path = klass.getAnnotation(javax.ws.rs.Path.class);
-        
-        if (path !=null && pathToInstance.containsKey(path.value())){
-            return new OSGiManagedComponentProvider(path.value(), klass);
+    public void destroyEndpoint(String pName) throws IllegalArgumentException, NullPointerException {
+        if (!servletNames.contains(pName)){
+            throw new IllegalArgumentException("The ressource of path "+pName+" has never been exposed");
         }
         
-        System.out.println(klass.getCanonicalName());
-        return new IoCProxiedComponentProvider() {
-            
-            public Object proxy(Object arg0) {
-                // TODO Auto-generated method stub
-                System.out.println("proxy called");
-                return klass.cast(arg0);
+        try {
+            if (httpservice != null) {
+                httpservice.unregister(pName);
             }
-            
-            public Object getInstance() {
-                try {
-                    System.out.println("getInstance called");
-                    return klass.newInstance();
-                } catch (InstantiationException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    return null;
-                } catch (IllegalAccessException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-        };
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory#getComponentProvider(com.sun.jersey.core.spi.component.ComponentContext, java.lang.Class)
-     */
-    public IoCComponentProvider getComponentProvider(ComponentContext ccontext, Class<?> klass) {
-        // TODO Auto-generated method stub
-        //String name = klass.getAnnotation(javax.ws.rs.Path.class).value();
-        //System.out.println("PAth value: "+name);
-        System.out.println(klass.getCanonicalName());
-        return getComponentProvider(klass);
-    }
-    
-    /*------------------------------------------------*
-     *  ComponentProvider Class                       *
-     *------------------------------------------------*/
-    
-    /**
-     * If an instance of ManagedComponentProvider is returned then the
-     * component is fully managed by the underlying IoC framework, which
-     * includes managing the construction, injection and destruction according
-     * to the life-cycle declared in the IoC framework's semantics.
-     */
-    private class OSGiManagedComponentProvider implements IoCManagedComponentProvider {
-        
-        private final String name;
-        private final Class klass;
-
-        OSGiManagedComponentProvider(String pName, Class pKlass) {
-            System.out.println("OSGi managed "+ pName);
-            name = pName;
-            klass = pKlass;
-        }
-
-        /**
-         * For now we support only the singleton pattern.
-         */
-        public ComponentScope getScope() {
-            return ComponentScope.Singleton;
-        }
-
-        public Object getInjectableInstance(Object o) {
-            //FIXME 
-            System.out.println("Object name: " +o.toString());
-            System.out.println("injectable "+((RessourceService) o).hello());
-            
-            return o;
-        }
-
-        public Object getInstance() 
-        {
-            System.out.println("" + pathToInstance.get(name));
-            return klass.cast(pathToInstance.get(name));
+        } catch (RuntimeException re) {
+            logger.log(LogService.LOG_ERROR, re.getMessage(), re);
         }
         
+        logger.log(LOG_INFO, "The ressource: "+pName+" has been succesfully unregistered");
     }
-    
+
 }

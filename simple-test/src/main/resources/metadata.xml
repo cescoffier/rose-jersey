@@ -14,27 +14,17 @@
 
 
 <ipojo xmlns:wbp="org.apache.felix.ipojo.whiteboard">
-	<component name="rose.component.rest.endpoint.factory"
-		classname="org.ow2.chameleon.rose.rest.JerseyEndpointFactory">
-
-		<provides>
-			<property name="remote.configs.supported" type="java.lang.String[]"
-				value="{jersey}" />
-		</provides>
+	<component name="myressource.component" classname="org.ow2.chameleon.test.rest.MyRessource">
+		<requires field="endpointFac" filter="(remote.configs.supported=jersey)"
+			optional="false" />
 
 		<properties>
-			<property field="servletname" name="servlet.name" value="/rest" />
+			<property field="name" name="name" value="YATAAA" />
 		</properties>
-		
-		<requires field="httpservice" optional="false" />
-		<requires field="logger" optional="true"
-			default-implementation="org.ow2.chameleon.rose.util.LogServiceImpl" />
 
 		<callback transition="validate" method="start" />
 		<callback transition="invalidate" method="stop" />
-
 	</component>
 
-	<instance name="org.ow2.chameleon.rose.server.EndpointFactory-REST"
-		component="rose.component.rest.endpoint.factory" />
+	<instance name="myressource" component="myressource.component" />
 </ipojo>

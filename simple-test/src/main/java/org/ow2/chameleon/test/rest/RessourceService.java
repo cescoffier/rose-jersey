@@ -1,4 +1,4 @@
-package org.ow2.chameleon.rose.rest;
+package org.ow2.chameleon.test.rest;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
