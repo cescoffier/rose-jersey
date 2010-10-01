@@ -15,9 +15,10 @@
 
 <ipojo xmlns:wbp="org.apache.felix.ipojo.whiteboard">
 	<component name="myressource.component" classname="org.ow2.chameleon.test.rest.MyRessource">
-		<requires field="endpointFac" filter="(remote.configs.supported=jersey)"
-			optional="false" />
+		<!--<requires field="endpointFac" filter="(remote.configs.supported=jersey)"
+			optional="false" /> -->
 
+		<requires field="pub"/>
 		<properties>
 			<property field="name" name="name" value="YATAAA" />
 		</properties>

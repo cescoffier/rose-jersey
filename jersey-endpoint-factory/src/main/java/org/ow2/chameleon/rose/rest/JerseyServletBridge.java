@@ -10,14 +10,14 @@ import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.spi.container.servlet.WebConfig;
 
 
-public class JerseyServletContainer extends ServletContainer{
+public class JerseyServletBridge extends ServletContainer{
 
     private static final long serialVersionUID = -1399500555655064091L;
     
     private final OSGiComponentProviderFactory providerFactory;
     
     
-    public JerseyServletContainer(OSGiComponentProviderFactory pProviderFactory) {
+    public JerseyServletBridge(OSGiComponentProviderFactory pProviderFactory) {
         super();
         providerFactory = pProviderFactory;
     }
@@ -29,10 +29,6 @@ public class JerseyServletContainer extends ServletContainer{
     
     @Override
     protected void initiate(ResourceConfig rsc, WebApplication webApp) {
-    	for (Class<?> klass : rsc.getClasses()) {
-			System.out.println(klass.getName());
-		}
-    	
         webApp.initiate(rsc,providerFactory);
     }
     

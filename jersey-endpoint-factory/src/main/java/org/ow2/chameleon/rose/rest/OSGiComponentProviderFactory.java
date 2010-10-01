@@ -1,13 +1,12 @@
 package org.ow2.chameleon.rose.rest;
 
-import static com.sun.jersey.api.core.ResourceConfig.isProviderClass;
 import static com.sun.jersey.api.core.ResourceConfig.isRootResourceClass;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.osgi.service.log.LogService;
+import javax.ws.rs.Path;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -26,22 +25,32 @@ import com.sun.jersey.core.spi.component.ioc.IoCProxiedComponentProvider;
 public class OSGiComponentProviderFactory implements IoCComponentProviderFactory {
 
     /**
-     * The LogService, injected by iPOJO.
-     */
-    private LogService logger;
-
-    /**
      * Path to ManagedComponentProvider
      */
     private Map<Class<?>,OSGiManagedComponentProvider> pathToInstance = new HashMap<Class<?>, OSGiManagedComponentProvider>();
     
     
     private ResourceConfig rsconfig = new DefaultResourceConfig();
-    
 
     
-    public OSGiComponentProviderFactory(LogService pLogger) {
-        logger = pLogger;
+    public void createManagedComponentProvider(Object instance, Class<?> klass){
+        addClass(klass);
+        
+        //Create the managed component provider and add the class to the map.
+        pathToInstance.put(klass,new OSGiManagedComponentProvider(instance,instance.getClass()));
+    }
+    
+    
+    /**
+     * Add a class to the ressource config, The class must be a RootRessourceClass or a provider class.
+     * @param klass
+     */
+    private void addClass(final Class<?> klass){
+        System.out.println(klass.getAnnotation(Path.class));
+        /*if (!isRootResourceClass(klass)){
+            throw new IllegalArgumentException("The class: "+klass.getCanonicalName()+" is not a root ressource or a provider class.");
+        }*/
+        getResourceConfig().getClasses().add(klass);
     }
     
     /*------------------------------------------------*
@@ -139,22 +148,6 @@ public class OSGiComponentProviderFactory implements IoCComponentProviderFactory
         public Object getInstance() {
             return instance;
         }
-    }
-    
-    
-    public void createProvider(Object instance, Class<?> klass){
-    	createProvider(klass);
-        pathToInstance.put(klass,new OSGiManagedComponentProvider(instance,instance.getClass()));
-    }
-    
-    public void createProvider(final Class<?> klass){
-    	for (Annotation anno : klass.getAnnotations()) {
-			System.out.println(anno.toString());
-		}
-        if (!(isRootResourceClass(klass) || isProviderClass(klass) )){
-            throw new IllegalArgumentException("The class:"+klass.getCanonicalName()+" is not a root ressource or a provider class.");
-        }
-        getResourceConfig().getClasses().add(klass);
     }
     
 }

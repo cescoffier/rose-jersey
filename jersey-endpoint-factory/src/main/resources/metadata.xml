@@ -17,10 +17,10 @@
 	<component name="rose.component.rest.endpoint.factory"
 		classname="org.ow2.chameleon.rose.rest.JerseyEndpointFactory">
 
-		<requires field="dummy"/>
-		<provides>
+		<provides specification="org.ow2.chameleon.rose.rest.ext.RestEndpointFactory">
 			<property name="remote.configs.supported" type="java.lang.String[]"
 				value="{jersey}" />
+			<property field="rootName" name="jersey.servlet.bridge.alias" value="/rest"/> 
 		</provides>
 
 		<requires field="httpservice" optional="false" />
@@ -33,7 +33,10 @@
 	</component>
 
 	<component name="myressource.d.component" classname="org.ow2.chameleon.rose.rest.MyDummyRessource">
-		<provides specification="org.ow2.chameleon.rose.rest.MyDummyRessourceSpec"/>
+		<provides/>
+		<requires field="publisher"/>
+		<callback transition="validate" method="start" />
+		<callback transition="invalidate" method="stop" />
 	</component>
 
 	<instance name="mydummy" component="myressource.d.component" />
