@@ -4,31 +4,29 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.osgi.framework.BundleContext;
-import org.ow2.chameleon.rose.rest.ext.RestEndpointFactory;
+import org.apache.felix.ipojo.Factory;
+import org.ow2.chameleon.rose.server.EndpointFactory;
 
 @Path("test")
 public class MyRessource {
-    
-    private RestEndpointFactory pub;
+
+    private EndpointFactory pub;
+
+    private Factory fac;
+
     private String name;
-    private BundleContext mycontext;
-    
-    public MyRessource(BundleContext context) {
-        mycontext=context;
-    }
-    
+
     @GET
     @Produces("text/plain")
-    public String hello(){
-        return name;
+    public String hello() {
+        return fac.getName();
     }
-    
-    void start(){
-        pub.createEndpoint(this,MyRessource.class.getName(),mycontext.getBundle());
+
+    void start() {
+        pub.createEndpoint(this, null);
     }
-    
-    void stop(){
-        pub.destroyEndpoint(MyRessource.class.getName());
+
+    void stop() {
+        pub.destroyEndpoint("test");
     }
 }

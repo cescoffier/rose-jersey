@@ -17,7 +17,7 @@
 	<component name="rose.component.rest.endpoint.factory"
 		classname="org.ow2.chameleon.rose.rest.JerseyEndpointFactory">
 
-		<provides specification="org.ow2.chameleon.rose.rest.ext.RestEndpointFactory">
+		<provides specification="org.ow2.chameleon.rose.server.EndpointFactory">
 			<property name="remote.configs.supported" type="java.lang.String[]"
 				value="{jersey}" />
 			<property field="rootName" name="jersey.servlet.bridge.alias" value="/rest"/> 
@@ -31,15 +31,6 @@
 		<callback transition="invalidate" method="stop" />
 
 	</component>
-
-	<component name="myressource.d.component" classname="org.ow2.chameleon.rose.rest.MyDummyRessource">
-		<provides/>
-		<requires field="publisher"/>
-		<callback transition="validate" method="start" />
-		<callback transition="invalidate" method="stop" />
-	</component>
-
-	<instance name="mydummy" component="myressource.d.component" />
 
 	<instance name="org.ow2.chameleon.rose.server.EndpointFactory-REST"
 		component="rose.component.rest.endpoint.factory" />

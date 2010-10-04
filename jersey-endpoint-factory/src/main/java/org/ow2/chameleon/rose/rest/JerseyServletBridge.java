@@ -14,10 +14,10 @@ public class JerseyServletBridge extends ServletContainer{
 
     private static final long serialVersionUID = -1399500555655064091L;
     
-    private final OSGiComponentProviderFactory providerFactory;
+    private final JerseyEndpointFactory providerFactory;
     
     
-    public JerseyServletBridge(OSGiComponentProviderFactory pProviderFactory) {
+    public JerseyServletBridge(JerseyEndpointFactory pProviderFactory) {
         super();
         providerFactory = pProviderFactory;
     }
@@ -31,5 +31,4 @@ public class JerseyServletBridge extends ServletContainer{
     protected void initiate(ResourceConfig rsc, WebApplication webApp) {
         webApp.initiate(rsc,providerFactory);
     }
-    
 }
