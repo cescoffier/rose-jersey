@@ -1,0 +1,227 @@
+<?xml version="1.0" ?>
+	<!--
+		- OSAmI: Open Source Ambient Intelligence - Copyright (C) 2010 UJF -
+		Contact: osami-general@osami-commons.org - - This library is free
+		software; you can redistribute it and/or - modify it under the terms
+		of the GNU Lesser General Public - License as published by the Free
+		Software Foundation; either - version 2.1 of the License, or any later
+		version. - - This library is distributed in the hope that it will be
+		useful, - but WITHOUT ANY WARRANTY; without even the implied warranty
+		of - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+		- Lesser General Public License for more details. - - You should have
+		received a copy of the GNU Lesser General Public - License along with
+		this library; if not, write to the Free Software - Foundation, Inc.,
+		59 Temple Place, Suite 330, Boston, MA 02111-1307 - USA
+	-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.ow2.chameleon.jersey</groupId>
+	<artifactId>runtime</artifactId>
+	<packaging>pom</packaging>
+	<name>OW2 Chameleon :: Jersey :: Runtime </name>
+	<version>0.1.0-SNAPSHOT</version>
+
+	<properties>
+		<!-- Runtime Directory -->
+		<runtime.dir>runtime</runtime.dir>
+		<core.dir>core</core.dir>
+		<deploy.dir>deploy</deploy.dir>
+		<app.dir>application</app.dir>
+	</properties>
+
+	<dependencies>
+	  <dependency>
+             <groupId>org.ow2.chameleon</groupId>
+             <artifactId>core</artifactId>
+             <classifier>distribution</classifier>
+             <type>zip</type>
+             <version>0.2.6</version>
+	   </dependency>
+	</dependencies>
+        <build>
+          <plugins>
+
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>${project.basedir}</directory>
+              <includes>
+                <include>${core.dir}</include>
+                <include>${runtime.dir}</include>
+                <include>${deploy.dir}</include>
+                <include>${app.dir}</include>
+                <include>felix-cache</include>
+                <include>chameleon-cache</include>
+                <include>log</include>
+                <include>tmp</include>
+              </includes>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+      <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-dependency-plugin</artifactId>
+         <version>2.1</version>
+         <executions>
+            <execution>
+                <id>copy-core</id>
+                <phase>process-resources</phase>
+                <goals>
+                  <goal>unpack-dependencies</goal>
+                </goals>
+                <configuration>
+                   <includes>**/*.jar</includes>
+                   <outputDirectory>.</outputDirectory>
+               	   <overWriteReleases>false</overWriteReleases>
+                   <overWriteSnapshots>true</overWriteSnapshots>
+                   <includeArtifactIds>core</includeArtifactIds>
+                   <includeClassifiers>distribution</includeClassifiers>
+                </configuration>
+            </execution>
+         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>copy-runtime</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.apache.felix</groupId>
+                  <artifactId>org.apache.felix.log</artifactId>
+                  <version>1.0.0</version>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${runtime.dir}</outputDirectory>
+                </artifactItem>
+		
+		<!-- PAX WEB -->
+                
+		<artifactItem>
+                  <groupId>org.ops4j.pax.web</groupId>
+                  <artifactId>pax-web-jsp</artifactId>
+                  <version>0.7.3</version>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${runtime.dir}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.ops4j.pax.web</groupId>
+                  <artifactId>pax-web-jetty-bundle</artifactId>
+                  <version>0.7.3</version>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${runtime.dir}</outputDirectory>
+                </artifactItem>
+
+		<!-- JERSEY dependencies -->
+		 
+		<artifactItem>
+                  <groupId>javax.mail</groupId>
+                  <artifactId>mail</artifactId>
+                  <version>1.4.3</version>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${runtime.dir}</outputDirectory>
+                </artifactItem>
+		<artifactItem>
+                  <groupId>javax.xml.bind</groupId>
+                  <artifactId>jaxb-api-osgi</artifactId>
+                  <version>2.2.1</version>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${runtime.dir}</outputDirectory>
+                </artifactItem>
+		<artifactItem>
+                  <groupId>com.sun.jersey</groupId>
+                  <artifactId>jersey-core</artifactId>
+                  <version>1.4</version>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${runtime.dir}</outputDirectory>
+                </artifactItem>
+		<artifactItem>
+                  <groupId>com.sun.jersey</groupId>
+                  <artifactId>jersey-server</artifactId>
+                  <version>1.4</version>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${runtime.dir}</outputDirectory>
+                </artifactItem>
+		
+		<!-- ROSE  -->
+              
+		<artifactItem>
+                  <groupId>org.ow2.chameleon.rose</groupId>
+                  <artifactId>org.ow2.chameleon.rose.core</artifactId>
+                  <version>0.2.2</version>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${runtime.dir}</outputDirectory>
+                </artifactItem>
+		
+		<!-- Application -->
+
+		<artifactItem>
+	          <groupId>org.ow2.chameleon.rose.rest</groupId>
+		  <artifactId>jersey-endpoint-factory</artifactId>
+		  <version>0.1.0-SNAPSHOT</version>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${app.dir}</outputDirectory>
+                </artifactItem>
+		<artifactItem>
+	          <groupId>org.ow2.chameleon.rose.rest</groupId>
+		  <artifactId>test-jersey-endpoint-factory</artifactId>
+		  <version>0.1.0-SNAPSHOT</version>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${app.dir}</outputDirectory>
+                </artifactItem>
+		</artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <repositories>
+    <repository>
+      <id>apache.releases</id>
+      <url>https://repository.apache.org/content/repositories/releases</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>ow2.release</id>
+      <url>http://maven.ow2.org/maven2/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+	<id>maven2-repository.dev.java.net</id>
+	<name>Java.net Repository for Maven</name>
+	<url>http://download.java.net/maven/2</url>
+	<layout>default</layout>
+    </repository>
+    <repository>
+	<id>maven-repository.dev.java.net</id>
+	<name>Java.net Maven 1 Repository (legacy)</name>
+	<url>http://download.java.net/maven/1</url>
+	<layout>legacy</layout>
+    </repository>
+  </repositories>
+
+</project>
