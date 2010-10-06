@@ -43,11 +43,11 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
+		<!--<dependency>
 			<groupId>org.ow2.chameleon.rose</groupId>
 			<artifactId>org.ow2.chameleon.rose.core</artifactId>
 			<version>${rose.core.version}</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.compendium</artifactId>

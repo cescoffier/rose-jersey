@@ -15,14 +15,12 @@
 
 <ipojo xmlns:wbp="org.apache.felix.ipojo.whiteboard">
 	<component name="myressource.component" classname="org.ow2.chameleon.test.rest.MyRessource">
-		<requires field="pub" filter="(remote.configs.supported=jersey)" optional="false"/>
-		<requires field="fac" filter="(factory.state=1)" optional="false"/>
-		<properties>
-			<property field="name" name="name" value="YATAAA" />
-		</properties>
+		<provides>
+			<property type="java.lang.String[]" name="service.exported.configs"
+				value="{jersey}" />
+		</provides>
 
-		<callback transition="validate" method="start" />
-		<callback transition="invalidate" method="stop" />
+		<requires field="fac" filter="(factory.state=1)" optional="false" />
 	</component>
 
 	<instance name="myressource" component="myressource.component" />

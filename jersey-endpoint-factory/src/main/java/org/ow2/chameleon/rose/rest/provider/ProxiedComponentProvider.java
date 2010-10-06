@@ -1,4 +1,4 @@
-package org.ow2.chameleon.rose.rest;
+package org.ow2.chameleon.rose.rest.provider;
 
 import com.sun.jersey.core.spi.component.ioc.IoCProxiedComponentProvider;
 

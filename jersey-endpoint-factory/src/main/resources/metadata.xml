@@ -13,7 +13,7 @@
 	-->
 
 
-<ipojo xmlns:wbp="org.apache.felix.ipojo.whiteboard">
+<ipojo>
 	<component name="rose.component.rest.endpoint.factory"
 		classname="org.ow2.chameleon.rose.rest.JerseyEndpointFactory">
 
@@ -31,6 +31,22 @@
 		<callback transition="invalidate" method="stop" />
 
 	</component>
+	
+		<component name="rose.component.rest.endpoint.auto-export"
+		classname="org.ow2.chameleon.rose.rest.auto.GenericEndpointFactory">
+		
+		<requires field="logger" optional="true" 
+				  default-implementation="org.ow2.chameleon.rose.util.LogServiceImpl"/>
+				  
+		<callback transition="validate" method="start" />
+		<callback transition="invalidate" method="stop" />
+
+		<requires field="exporter" filter="(instance.name=org.ow2.chameleon.rose.server.EndpointFactory-REST)" optional="false" />
+	</component>
+
+	<instance
+		name="org.ow2.chameleon.rose.server-JSR311-Auto-Export"
+		component="rose.component.rest.endpoint.auto-export" />
 
 	<instance name="org.ow2.chameleon.rose.server.EndpointFactory-REST"
 		component="rose.component.rest.endpoint.factory" />

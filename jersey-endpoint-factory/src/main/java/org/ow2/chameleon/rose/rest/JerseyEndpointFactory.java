@@ -1,6 +1,5 @@
 package org.ow2.chameleon.rose.rest;
 
-import static org.osgi.service.log.LogService.LOG_ERROR;
 import static org.osgi.service.log.LogService.LOG_INFO;
 
 import java.util.Hashtable;
@@ -10,6 +9,8 @@ import javax.ws.rs.Path;
 
 import org.osgi.service.http.HttpService;
 import org.osgi.service.log.LogService;
+import org.ow2.chameleon.rose.rest.provider.ManagedComponentProvider;
+import org.ow2.chameleon.rose.rest.provider.ProxiedComponentProvider;
 import org.ow2.chameleon.rose.server.EndpointFactory;
 
 import com.sun.jersey.api.core.ResourceConfig;
@@ -80,7 +81,7 @@ public class JerseyEndpointFactory implements EndpointFactory, IoCComponentProvi
                 throw new RuntimeException("Cannot register the JerseyServlet bridge", e);
             }
         } else {
-            container.load();
+            container.reload();
         }
     }
 
@@ -90,12 +91,17 @@ public class JerseyEndpointFactory implements EndpointFactory, IoCComponentProvi
 
     public void destroyEndpoint(String pathName) {
         rsconfig.removeComponentProvider(pathName);
-        logger.log(LOG_INFO, "The ressource: "+pathName+" is no more available.");
+        try {
+            container.reload();
+        } catch (Exception e) {
+            //no big deal
+        }
+        logger.log(LOG_INFO, "The ressource: " + pathName + " is no more available.");
     }
 
     public void createEndpoint(Object pService, Map<String, String> properties) throws IllegalArgumentException {
         addRessource(pService, pService.getClass());
-        logger.log(LOG_INFO, "The ressource: "+pService.getClass().getAnnotation(Path.class).value()+" is now available.");
+        logger.log(LOG_INFO, "The ressource: " + pService.getClass().getAnnotation(Path.class).value() + " is now available.");
     }
 
     public void createEndpoint(Object pService, ClassLoader pLoader, Map<String, String> properties) throws IllegalArgumentException {

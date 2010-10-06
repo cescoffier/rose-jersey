@@ -83,7 +83,9 @@
 							${project.artifactId}
 						</Bundle-SymbolicName>
 						<Private-Package>
-							org.ow2.chameleon.rose.rest
+							org.ow2.chameleon.rose.rest,
+							org.ow2.chameleon.rose.rest.auto,
+							org.ow2.chameleon.rose.rest.provider
 						</Private-Package>
 						<Export-Package/>
 						<Import-Package>

@@ -1,4 +1,4 @@
-package org.ow2.chameleon.rose.rest;
+package org.ow2.chameleon.rose.rest.provider;
 
 import static com.sun.jersey.core.spi.component.ComponentScope.Singleton;
 
@@ -15,7 +15,7 @@ public class ManagedComponentProvider implements IoCManagedComponentProvider {
     
     private final Object instance;
 
-    ManagedComponentProvider(Object pInstance) {
+    public ManagedComponentProvider(Object pInstance) {
         instance = pInstance;
     }
 
