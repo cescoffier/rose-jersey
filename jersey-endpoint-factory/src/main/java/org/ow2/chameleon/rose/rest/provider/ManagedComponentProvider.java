@@ -27,7 +27,7 @@ public class ManagedComponentProvider implements IoCManagedComponentProvider {
     }
 
     public Object getInjectableInstance(Object o) {
-        return o;
+        return instance;
     }
 
     public Object getInstance() {

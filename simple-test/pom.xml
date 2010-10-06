@@ -1,19 +1,18 @@
 <?json version="1.0"?>
-<!--
-	Copyright 2009 OW2 Chameleon
-	Licensed under the Apache License, Version 2.0 (the "License");
-	you may not use this file except in compliance with the License.
-	You may obtain a copy of the License at
+	<!--
+		Copyright 2009 OW2 Chameleon Licensed under the Apache License,
+		Version 2.0 (the "License"); you may not use this file except in
+		compliance with the License. You may obtain a copy of the License at
 
-   http://www.apache.org/licenses/LICENSE-2.0
-
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+		http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+		applicable law or agreed to in writing, software distributed under the
+		License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+		CONDITIONS OF ANY KIND, either express or implied. See the License for
+		the specific language governing permissions and limitations under the
+		License.
+	-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<!-- Project's parent -->
 	<parent>
@@ -31,7 +30,7 @@
 
 	<!-- All the version number should be set here-->
 	<properties>
-		<ipojo.version>1.6.2</ipojo.version>
+		<ipojo.version>1.6.4</ipojo.version>
 		<osgi.version>4.2.0</osgi.version>
 		<bundle.plugin.version>2.1.0</bundle.plugin.version>
 		<ipojo.plugin.version>1.6.0</ipojo.plugin.version>
@@ -39,15 +38,15 @@
 		<rose.core.version>0.2.2</rose.core.version>
 
 		<!-- Encoding -->
-    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<dependencies>
-		<!--<dependency>
-			<groupId>org.ow2.chameleon.rose</groupId>
+		<!--
+			<dependency> <groupId>org.ow2.chameleon.rose</groupId>
 			<artifactId>org.ow2.chameleon.rose.core</artifactId>
-			<version>${rose.core.version}</version>
-		</dependency> -->
+			<version>${rose.core.version}</version> </dependency>
+		-->
 		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.compendium</artifactId>
@@ -62,6 +61,11 @@
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.ipojo</artifactId>
 			<version>${ipojo.version}</version>
+		</dependency>
+		<dependency>
+     	 <groupId>org.apache.felix</groupId>
+     	 <artifactId>org.apache.felix.ipojo.annotations</artifactId>
+     	 <version>${ipojo.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -81,10 +85,10 @@
 						</Private-Package>
 						<Export-Package />
 						<Import-Package>
-							org.osgi.service.log;version=1.3, 
-							org.ow2.chameleon.rose.server;version=0.2, 
-							org.ow2.chameleon.rose.util;version=0.2, 
-							org.osgi.framework;version=1.3, 
+							org.osgi.service.log;version=1.3,
+							org.ow2.chameleon.rose.server;version=0.2,
+							org.ow2.chameleon.rose.util;version=0.2,
+							org.osgi.framework;version=1.3,
 							org.osgi.service.http;version=1.2,
 							javax.ws.rs,
 							*
@@ -95,7 +99,6 @@
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-ipojo-plugin</artifactId>
-				<version>${ipojo.plugin.version}</version>
 				<executions>
 					<execution>
 						<goals>
@@ -103,6 +106,14 @@
 						</goals>
 					</execution>
 				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.felix</groupId>
+						<artifactId>org.apache.felix.ipojo.manipulator</artifactId>
+						<version>1.6.4</version>
+					</dependency>
+				</dependencies>
+
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -121,7 +132,7 @@
 			<name>Java.net Repository for Maven</name>
 			<url>stt/</url>
 			<layout>default</layout>
-		</repository> 
+		</repository>
 		<repository>
 			<id>maven-repository.dev.java.net</id>
 			<name>Java.net Maven 1 Repository (legacy)</name>
